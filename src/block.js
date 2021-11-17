@@ -37,11 +37,22 @@ class Block {
   validate() {
     let self = this;
     return new Promise((resolve, reject) => {
-      // Save in auxiliary variable the current block hash
-      // Recalculate the hash of the Block
-      // Comparing if the hashes changed
-      // Returning the Block is not valid
-      // Returning the Block is valid
+      try {
+        // Save in auxiliary variable the current block hash
+        const currentHash = self.hash;
+        self.hash = { ...this.hash };
+
+        // Recalculate the hash of the Block
+        const newHash = SHA256(JSON.stringify(self)).toString();
+        self.hash = currentHash;
+
+        // Comparing if the hashes changed
+        resolve(currentHash === newHash);
+        // Returning the Block is not valid
+        // Returning the Block is valid
+      } catch (error) {
+        reject(new Error(error));
+      }
     });
   }
 
@@ -55,11 +66,31 @@ class Block {
    *     or Reject with an error.
    */
   getBData() {
-    // Getting the encoded data saved in the Block
-    // Decoding the data to retrieve the JSON representation of the object
-    // Parse the data to an object to be retrieve.
-    // Resolve with the data if the object isn't the Genesis block
+    return new Promise((resolve, reject) => {
+      try {
+        if (this.height === 0) {
+          resolve("Genesis Block");
+        }
+
+        // Getting the encoded data saved in the Block
+        const currentData = this.body;
+
+        // Decoding the data to retrieve the JSON representation of the object
+        const decodedData = hex2ascii(currentData);
+
+        // Parse the data to an object to be retrieve.
+        // Resolve with the data if the object isn't the Genesis block
+        resolve(JSON.parse(decodedData));
+      } catch (error) {
+        reject(new Error(error));
+      }
+    });
   }
 }
+
+// let myBlock = new Block({ message: "Hi, there" });
+
+// let validate = myBlock.validate().then(res => console.log(res));
+// let bData = myBlock.getBData().then(res => console.log(res));
 
 module.exports.Block = Block; // Exposing the Block class as a module
