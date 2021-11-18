@@ -75,6 +75,14 @@ class Blockchain {
 
         self.chain.push(block);
 
+        const errorsOnValidateChain = await this.validateChain();
+
+        // If there is error on validate chain, error.length > 0
+        if (errorsOnValidateChain.length) {
+          reject("Chain Validation Failed");
+          return;
+        }
+
         resolve(block);
       } catch (error) {
         reject(new Error(error));
