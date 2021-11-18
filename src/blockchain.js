@@ -221,13 +221,27 @@ class Blockchain {
   /**
    * This method will return a Promise that will resolve with the list of errors when validating the chain.
    * Steps to validate:
-   * 1. You should validate each block using `validateBlock`
+   * 1. You should validate each block using `validate()`
    * 2. Each Block should check the with the previousBlockHash
    */
   validateChain() {
     let self = this;
     let errorLog = [];
-    return new Promise(async (resolve, reject) => {});
+    return new Promise(async (resolve, reject) => {
+      try {
+        for (let block of self.chain) {
+          const isValidBlock = block.validate();
+
+          if (isValidBlock) {
+            resolve(errorLog);
+          } else {
+            resolve(errorLog.push("Error Validate Chain"));
+          }
+        }
+      } catch (error) {
+        reject(error.message);
+      }
+    });
   }
 }
 
